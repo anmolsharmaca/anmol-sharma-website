@@ -380,13 +380,25 @@ footer a:hover{color:var(--white)}
   nav.desktop{display:none}
   .hamburger{display:block}
   .mobilenav{display:block}
-  .topbar .container{justify-content:center;gap:16px;font-size:12px}
+  .topbar .container{justify-content:center;gap:6px 16px;font-size:12px;flex-wrap:wrap;text-align:center}
   .svc-grid{grid-template-columns:1fr}
   .why-grid{grid-template-columns:1fr;gap:22px}
   form .row{grid-template-columns:1fr}
-  .hero .container{padding-top:64px;padding-bottom:64px}
+  /* Hero: extra bottom space so floating buttons never overlap content,
+     subtler lines so text stays crisp, full-width action buttons */
+  .hero .container{padding-top:60px;padding-bottom:110px}
+  .hero-lines{opacity:.4}
+  .hero h1{font-size:clamp(30px,8.5vw,38px);line-height:1.18}
+  .hero p{font-size:16px}
+  .hero .actions{flex-direction:column;align-items:stretch;gap:12px;max-width:340px}
+  .hero .actions a{text-align:center}
   section{padding:60px 0}
   .f-top{grid-template-columns:1fr;gap:32px}
+  /* Floating buttons: compact + clear of content */
+  .wa-float{bottom:calc(16px + env(safe-area-inset-bottom));left:14px;padding:13px}
+  #toTop{bottom:calc(16px + env(safe-area-inset-bottom));right:14px;width:42px;height:42px}
+  /* Give page bottom breathing room so last section isn't hidden behind floats */
+  footer{padding-bottom:70px}
 }
 </style>
 </head>
@@ -1076,16 +1088,18 @@ document.querySelectorAll('input[name="gstMode"]').forEach(r => r.addEventListen
 (function(){
   const svg = document.getElementById('heroLines');
   if (!svg) return;
-  const N = 30;                 // number of lines
+  const mobile = window.innerWidth < 720;
+  const N = mobile ? 14 : 30;      // fewer, calmer lines on mobile
   for (let i = 0; i < N; i++) {
     const t = i / (N - 1);      // 0 → 1
-    // Lines fan out: start bunched at top-left, sweep down-right in smooth curves
+    // Lines fan out: start bunched at top-left, sweep down-right in smooth curves.
+    // On mobile they are pushed higher so they stay above/behind the headline area.
     const startX = -80;
-    const startY = -40 + t * 90;
-    const c1x = 360 + t * 120,  c1y = 60  + t * 260;
-    const c2x = 820 - t * 140,  c2y = 240 + t * 380;
+    const startY = (mobile ? -80 : -40) + t * (mobile ? 60 : 90);
+    const c1x = 360 + t * 120,  c1y = (mobile ? 10 : 60) + t * (mobile ? 160 : 260);
+    const c2x = 820 - t * 140,  c2y = (mobile ? 140 : 240) + t * (mobile ? 260 : 380);
     const endX = 1520;
-    const endY = 40 + t * 620;
+    const endY = (mobile ? -20 : 40) + t * (mobile ? 420 : 620);
     const p = document.createElementNS('http://www.w3.org/2000/svg','path');
     p.setAttribute('d', `M ${startX} ${startY} C ${c1x} ${c1y}, ${c2x} ${c2y}, ${endX} ${endY}`);
     p.style.animationDelay = (i * 0.06) + 's, ' + (i * 0.18) + 's';
